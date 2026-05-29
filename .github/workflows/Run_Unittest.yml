@@ -1,5 +1,6 @@
 name: Validation of Console App
-on: push
+on: workflow_dispatch
+#on: push
   #pull_request:
   #  branches: [ master, develop, release/*, hotfix/* ]
 jobs:
