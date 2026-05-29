@@ -1,0 +1,33 @@
+name: Validation of Console App
+on: push
+  #pull_request:
+  #  branches: [ master, develop, release/*, hotfix/* ]
+jobs:
+  run-selected-unittests:
+    runs-on: windows-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    name: Run MSBuild and VSTest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.1.0
+        id: checkout_code
+            
+      - name: Setup MSBuild and add to PATH
+        uses: microsoft/setup-msbuild@v1.0.0
+        id: setup_msbuild
+              
+      - name: Run MSBuild
+        id: run_msbuild
+        run: |
+          msbuild .\gitactionstest.sln  /t:clean /p:Configuration=Debug
+          nuget restore .\gitactionstest.sln
+          msbuild .\gitactionstest.sln  /t:build /p:Configuration=Debug
+      - name: Setup VSTest and add to PATH
+        uses: darenm/Setup-VSTest@v1
+        id: setup_vstest
+      - name: Test Case Workers
+        id: run_vstest
+        working-directory: UnitTests\bin\Debug
+        run: vstest.console.exe .\UnitTests.dll /Tests:TestCaseWorkerIds,TestCaseWorkersCount
